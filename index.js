@@ -22,6 +22,7 @@ client.once(Events.ClientReady, c => {
 client.on(Events.MessageCreate, async (message) => {
         const responseChannel = client.channels.cache.get(responseChannelId);
         const intentoryChannel = client.channels.cache.get(inventoryChannelId);
+        const sellChannell = client.channels.cache.get(sellchannelId);
         if (message.channel.id === sellchannelId) {
             if (message.content.startsWith(prefix)) {
                 const [_, amount, product] = message.content.split(' ');
@@ -30,7 +31,7 @@ client.on(Events.MessageCreate, async (message) => {
                     dinero = dinero + (parseInt(amount) * 500);
                     const responseMessage = `¡Se han devuelto ${parseInt(amount) * 500} por la botella de vuelta! ¡La cantidad total es ${dinero}!`;
                     await responseChannel.send(responseMessage);
-                    await sellchannelId.send('¡Añadido correctamente!')
+                    await sellChannell.send('¡Añadido correctamente!');
                     await intentoryChannel.send(`La cantidad de botellas son ${botella}`);
                 } else {
                 }
