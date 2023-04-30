@@ -8,12 +8,10 @@ const client = new Client({intents: [GatewayIntentBits.Guilds, GatewayIntentBits
 
 
 let prefix = '+';
-let prefixCommand = '!';
 
-const responseChannel = client.channels.cache.get(responseChannelId);
 
-let botella=0;
-let dinero=0;
+let botella = 0;
+let dinero = 0;
 // When the client is ready, run this code (only once)
 // We use 'c' for the event parameter to keep it separate from the already defined 'client'
 client.once(Events.ClientReady, c => {
@@ -22,26 +20,27 @@ client.once(Events.ClientReady, c => {
 
 
 client.on(Events.MessageCreate, async (message) => {
+        const responseChannel = client.channels.cache.get(responseChannelId);
+        const intentoryChannel = client.channels.cache.get(inventoryChannelId);
         if (message.channel.id === sellchannelId) {
-            console.log(message.content);
-            const [_, amount, product] = message.content.split(' ');
-            console.log(_ + ' + ' + amount + ' + ' + product);
-            if (product === 'venta-botella') {
-                const intentoryChannel = client.channels.cache.get(inventoryChannelId);
-                const responseChannel = client.channels.cache.get(responseChannelId);
-                botella = botella-parseInt(amount) ;
-                dinero = dinero + (parseInt(amount)*500);
-                const responseMessage = `¡Se han devuelto ${parseInt(amount) * 500} por la botella de vuelta! ¡La cantidad total es ${dinero}!`;
-                await responseChannel.send(responseMessage);
-                await intentoryChannel.send(`La cantidad de botellas son ${botella}`);
+            if (message.content.startsWith(prefix)) {
+                const [_, amount, product] = message.content.split(' ');
+                if (product === 'venta-botella' && botella >= 0) {
+                    botella = botella - parseInt(amount);
+                    dinero = dinero + (parseInt(amount) * 500);
+                    const responseMessage = `¡Se han devuelto ${parseInt(amount) * 500} por la botella de vuelta! ¡La cantidad total es ${dinero}!`;
+                    await responseChannel.send(responseMessage);
+                    await sellchannelId.send('¡Añadido correctamente!')
+                    await intentoryChannel.send(`La cantidad de botellas son ${botella}`);
+                } else {
+                }
             }
         } else if (message.channel.id === buyChannelId) {
             const [_, amount] = message.content.split(' ');
-            const intentoryChannel = client.channels.cache.get(inventoryChannelId);
-            console.log(_ + ' + ' + parseInt(amount));
-            botella = parseInt(amount) + botella;
-            console.log(amount);
-            await intentoryChannel.send(`La cantidad de botellas son `+ botella);
+            if (message.content.startsWith(prefix) && parseInt(amount)) {
+                botella = parseInt(amount) + botella;
+                await intentoryChannel.send(`La cantidad de botellas son ` + botella);
+            }
         }
     }
 )
